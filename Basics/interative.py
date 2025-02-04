@@ -1,6 +1,4 @@
-# sourcery skip: min-max-identity
 import pygame
-import sys
 
 # Inisialisasi Pygame
 pygame.init()
@@ -30,7 +28,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit()
 
     # Mendapatkan input dari keyboard
     keys = pygame.key.get_pressed()

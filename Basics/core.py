@@ -1,7 +1,6 @@
 import pygame
-import sys
 
-# Inisialisasi Pygame
+# Inisialisasi Pygame/awali
 pygame.init()
 
 # Ukuran layar
@@ -43,4 +42,3 @@ while running:
 
 # Keluar dari Pygame
 pygame.quit()
-sys.exit()
