@@ -1,4 +1,5 @@
 import pygame
+import random
 from pygame.locals import K_w, K_a, K_s, K_d, K_UP, K_DOWN, K_LEFT, K_RIGHT
 from pygame.locals import K_BACKSPACE, KEYDOWN, QUIT
 
@@ -54,8 +55,16 @@ class Line(pygame.sprite.Sprite):
         # Garis tetap di tempat yang sama, jadi tidak perlu pergerakan
         pass
 
+# Class untuk membuat lingkaran
+class Circle(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super(Circle, self).__init__()
+        self.surf = pygame.Surface((20, 20), pygame.SRCALPHA)
+        pygame.draw.circle(self.surf, (120,0,10), (10, 10), 10)
+        self.rect = self.surf.get_rect(topleft=(x, y))
+
 # Fungsi untuk memeriksa input dan kolisi
-def handle_input_and_collision(player, borders, squares, keys):
+def handle_input_and_collision(player, borders, squares, circle, keys):
     if keys[K_RIGHT] or keys[K_d]:
         player.moveRight()
         if pygame.sprite.spritecollide(player, borders, False) or pygame.sprite.spritecollide(player, squares, False):
@@ -72,6 +81,20 @@ def handle_input_and_collision(player, borders, squares, keys):
         player.moveUp()
         if pygame.sprite.spritecollide(player, borders, False) or pygame.sprite.spritecollide(player, squares, False):
             player.moveDown()
+
+    # Deteksi tabrakan dengan lingkaran
+    if pygame.sprite.collide_rect(player, circle):
+        return True
+    return False
+
+# Fungsi untuk membuat lingkaran di posisi acak
+def create_random_circle(squares, borders, player):
+    while True:
+        x = random.randint(0, 770)
+        y = random.randint(0, 570)
+        circle = Circle(x, y)
+        if not pygame.sprite.spritecollide(circle, squares, False) and not pygame.sprite.spritecollide(circle, borders, False) and not pygame.sprite.collide_rect(circle, player):
+            return circle
 
 # inisialisasi pygame
 pygame.init()
@@ -109,8 +132,15 @@ squares.add(square1, square2, square3, square4)
 borders = pygame.sprite.Group()
 borders.add(top_border, bottom_border, left_border, right_border)
 
+# Membuat lingkaran di posisi acak
+circle = create_random_circle(squares, borders, player)
+
 # Variabel untuk menjaga loop game tetap berjalan
 gameOn = True
+
+# Variabel untuk menyimpan skor
+score = 0
+font = pygame.font.Font(None, 36)
 
 # Loop game utama
 while gameOn:
@@ -127,7 +157,9 @@ while gameOn:
     keys = pygame.key.get_pressed()
 
     # Tangani input dan kolisi
-    handle_input_and_collision(player, borders, squares, keys)
+    if handle_input_and_collision(player, borders, squares, circle, keys):
+        score += 1
+        circle = create_random_circle(squares, borders, player)
 
     # Bersihkan layar menjadi hitam sebelum menggambar objek-objek ulang
     screen.fill((0, 0, 0))
@@ -141,11 +173,18 @@ while gameOn:
     for border in borders:
         screen.blit(border.surf, border.rect.topleft)
 
+    # Menggambar lingkaran
+    screen.blit(circle.surf, circle.rect.topleft)
+
+    # Menggambar skor
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(score_text, (10, 10))
+
     # Memperbarui tampilan dengan flip
     pygame.display.flip()
 
     # Penentuan frame per detik
-    frame.tick(120)
+    frame.tick(60)
 
 # Menutup pygame setelah keluar dari loop
 pygame.quit()
