@@ -1,9 +1,11 @@
 import pygame
 import random
 from pygame.locals import K_w, K_a, K_s, K_d, K_UP, K_DOWN, K_LEFT, K_RIGHT
-from pygame.locals import K_BACKSPACE, KEYDOWN, QUIT
+from pygame.locals import K_BACKSPACE, KEYDOWN, QUIT, K_ESCAPE, K_RETURN
 
 # Pendefinisian objek game kotak dengan membuat class dengan nama Square
+
+
 class Square(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super(Square, self).__init__()
@@ -12,6 +14,8 @@ class Square(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(topleft=(x, y))
 
 # Pendefinisian objek game kotak dengan membuat class dengan nama Player
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
@@ -27,17 +31,27 @@ class Player(pygame.sprite.Sprite):
 
     def moveRight(self):
         self.rect.x += 9
+        if sfx_move.get_num_channels() == 0:  # Cek apakah efek suara sedang dimainkan
+            sfx_move.play()  # Memutar efek suara saat bergerak
 
     def moveLeft(self):
         self.rect.x -= 9
+        if sfx_move.get_num_channels() == 0:
+            sfx_move.play()
 
     def moveDown(self):
         self.rect.y += 9
+        if sfx_move.get_num_channels() == 0:
+            sfx_move.play()
 
     def moveUp(self):
         self.rect.y -= 9
+        if sfx_move.get_num_channels() == 0:
+            sfx_move.play()
 
 # Class untuk membuat garis border
+
+
 class Line(pygame.sprite.Sprite):
     def __init__(self, x1, y1, x2, y2):
         super(Line, self).__init__()
@@ -56,14 +70,18 @@ class Line(pygame.sprite.Sprite):
         pass
 
 # Class untuk membuat lingkaran
+
+
 class Circle(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super(Circle, self).__init__()
         self.surf = pygame.Surface((20, 20), pygame.SRCALPHA)
-        pygame.draw.circle(self.surf, (120,0,10), (10, 10), 10)
+        pygame.draw.circle(self.surf, (120, 0, 10), (10, 10), 10)
         self.rect = self.surf.get_rect(topleft=(x, y))
 
 # Fungsi untuk memeriksa input dan kolisi
+
+
 def handle_input_and_collision(player, borders, squares, circle, keys):
     if keys[K_RIGHT] or keys[K_d]:
         player.moveRight()
@@ -83,21 +101,119 @@ def handle_input_and_collision(player, borders, squares, circle, keys):
             player.moveDown()
 
     # Deteksi tabrakan dengan lingkaran
-    if pygame.sprite.collide_rect(player, circle):
-        return True
-    return False
+    return pygame.sprite.collide_rect(player, circle)
 
 # Fungsi untuk membuat lingkaran di posisi acak
+
+
 def create_random_circle(squares, borders, player):
     while True:
         x = random.randint(0, 770)
         y = random.randint(0, 570)
         circle = Circle(x, y)
-        if not pygame.sprite.spritecollide(circle, squares, False) and not pygame.sprite.spritecollide(circle, borders, False) and not pygame.sprite.collide_rect(circle, player):
+        if not any(pygame.sprite.spritecollide(circle, group, False) for group in [squares, borders]) and not pygame.sprite.collide_rect(circle, player):
             return circle
+
+# Fungsi untuk menampilkan teks di layar
+
+
+def draw_text(screen, text, font, color, x, y):
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, (x, y))
+
+# Fungsi untuk menampilkan menu utama
+
+
+def main_menu():
+    # Memuat musik latar belakang (BGM)
+    pygame.mixer.music.load('./Basics/assets/bgm.mp3')
+    pygame.mixer.music.play(-1)  # -1 Memutar musik secara loop (kosongkan parameter untuk memutar sekali)
+
+    # Membuat pilihan menu
+    selected_option = 0
+    options = ["Start Game", "Quit"]
+
+    while True:
+        screen.fill((0, 0, 0))
+        draw_text(screen, "Main Menu", font, (255, 255, 255), 350, 200)
+        for i, option in enumerate(options):
+            color = (255, 255, 255) if i == selected_option else (100, 100, 100)
+            draw_text(screen, option, font, color, 350, 250 + i * 50)
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return False
+
+            if event.type == KEYDOWN:
+                if event.key == K_RETURN:
+                    if selected_option == 0:  # Start Game
+                        return True
+                    elif selected_option == 1:  # Quit
+                        return False
+
+                if event.key == K_ESCAPE:
+                    return False
+
+                if event.key == K_DOWN:
+                    selected_option = (selected_option + 1) % len(options)
+                if event.key == K_UP:
+                    selected_option = (selected_option - 1) % len(options)
+
+
+# Fungsi untuk menampilkan menu pause
+def pause_menu():
+    # Membuat pilihan menu
+    selected_option = 0  # opsi default
+    options = ["Resume", "Main Menu", "Quit"]
+
+    while True:
+        # Menggambar layar transparan di atas gameplay
+        overlay = pygame.Surface((800, 600), pygame.SRCALPHA)
+        overlay.fill((25, 25, 25, 1))  # Transparan hitam
+        screen.blit(overlay, (0, 0))
+        screen.blit(score_text, (360, 550))  # Score tetap ditampilkan
+
+        # Menggambar teks menu pause
+        draw_text(screen, "Pause Menu", font, (255, 255, 255), 350, 200)
+        for i, option in enumerate(options):
+            color = (255, 255, 255) if i == selected_option else (
+                100, 100, 100)
+            draw_text(screen, option, font, color, 350, 250 + i * 50)
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                return False
+
+            if event.type == KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if selected_option == 0:  # Resume
+                        return True
+                    elif selected_option == 1:  # Main Menu
+                        main_menu()
+                        return True
+                    elif selected_option == 2:  # Quit
+                        return False
+
+                if event.key == K_ESCAPE:
+                    return True
+                if event.key in [K_DOWN, K_s]:
+                    selected_option = (selected_option + 1) % len(options)
+                if event.key in [K_UP, K_w]:
+                    selected_option = (selected_option - 1) % len(options)
+
 
 # inisialisasi pygame
 pygame.init()
+
+# Inisialisasi mixer untuk musik
+pygame.mixer.init()
+
+# Memuat efek suara (SFX)
+sfx_move = pygame.mixer.Sound('./Basics/assets/move.wav')
 
 # Menentukan judul layar/window/game
 pygame.display.set_caption("Game Kotak")
@@ -135,12 +251,12 @@ borders.add(top_border, bottom_border, left_border, right_border)
 # Membuat lingkaran di posisi acak
 circle = create_random_circle(squares, borders, player)
 
-# Variabel untuk menjaga loop game tetap berjalan
-gameOn = True
-
 # Variabel untuk menyimpan skor
 score = 0
 font = pygame.font.Font(None, 36)
+
+# Variabel untuk menjaga loop game tetap berjalan
+gameOn = main_menu()
 
 # Loop game utama
 while gameOn:
@@ -150,8 +266,11 @@ while gameOn:
             gameOn = False
 
         # Cek key tipe tekan sekali (bukan tahan)
-        if event.type == KEYDOWN and event.key == K_BACKSPACE:
-            gameOn = False
+        if event.type == KEYDOWN:
+            if event.key == K_BACKSPACE:
+                gameOn = False
+            if event.key == K_ESCAPE:
+                gameOn = pause_menu()
 
     # Definisi keadaan tombol keyboard apakah ditekan atau tidak setiap frame
     keys = pygame.key.get_pressed()
@@ -165,8 +284,8 @@ while gameOn:
     screen.fill((0, 0, 0))
 
     # Menggunakan blit untuk menggambar objek-objek di layar
-    screen.blit(player.surf, player.rect.topleft) # Player
-    for square in squares: # Loop untuk group objek
+    screen.blit(player.surf, player.rect.topleft)  # Player
+    for square in squares:  # Loop untuk group objek
         screen.blit(square.surf, square.rect.topleft)
 
     # Menggambar border (garis batas) di sekeliling layar
@@ -178,7 +297,7 @@ while gameOn:
 
     # Menggambar skor
     score_text = font.render(f"Score: {score}", True, (255, 255, 255))
-    screen.blit(score_text, (10, 10))
+    screen.blit(score_text, (360, 550))
 
     # Memperbarui tampilan dengan flip
     pygame.display.flip()

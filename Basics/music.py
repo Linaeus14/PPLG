@@ -7,11 +7,11 @@ pygame.init()
 pygame.mixer.init()
 
 # Memuat musik latar belakang (BGM)
-pygame.mixer.music.load('Basics/assets/bgm.mp3')
+pygame.mixer.music.load('./Basics/assets/bgm.mp3')
 pygame.mixer.music.play(-1)  # -1 Memutar musik secara loop (kosongkan parameter untuk memutar sekali)
 
 # Memuat efek suara (SFX)
-sfx_move = pygame.mixer.Sound('Basics/assets/move.wav')
+sfx_move = pygame.mixer.Sound('./Basics/assets/move.wav')
 
 # Ukuran layar
 screen_width = 800
@@ -37,30 +37,32 @@ running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
+            running = False
 
     # Mendapatkan input dari keyboard
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         square_x -= speed
-        sfx_move.play()  # Memutar efek suara saat bergerak
+        if sfx_move.get_num_channels() == 0:  # Cek apakah efek suara sedang dimainkan
+            sfx_move.play()  # Memutar efek suara saat bergerak
     if keys[pygame.K_RIGHT]:
         square_x += speed
-        sfx_move.play()  # Memutar efek suara saat bergerak
+        if sfx_move.get_num_channels() == 0:
+            sfx_move.play()
     if keys[pygame.K_UP]:
         square_y -= speed
-        sfx_move.play()  # Memutar efek suara saat bergerak
+        if sfx_move.get_num_channels() == 0:
+            sfx_move.play()
     if keys[pygame.K_DOWN]:
         square_y += speed
-        sfx_move.play()  # Memutar efek suara saat bergerak
+        if sfx_move.get_num_channels() == 0:
+            sfx_move.play()
 
     # Deteksi tabrakan dengan batas layar
-    if square_x < 0:
-        square_x = 0
+    square_x = max(square_x, 0)
     if square_x + square_size > screen_width:
         square_x = screen_width - square_size
-    if square_y < 0:
-        square_y = 0
+    square_y = max(square_y, 0)
     if square_y + square_size > screen_height:
         square_y = screen_height - square_size
 
@@ -71,3 +73,4 @@ while running:
     # Memperbarui layar
     pygame.display.flip()
     clock.tick(60)
+pygame.quit()
