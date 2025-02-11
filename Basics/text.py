@@ -31,6 +31,7 @@ def main_menu():
     while True:
         screen.fill(black)
         draw_text(screen, "Main Menu", font, white, 350, 200)
+
         for i, option in enumerate(options):
             color = white if i == selected_option else gray
             draw_text(screen, option, font, color, 350, 250 + i * 50)
@@ -53,6 +54,7 @@ def main_menu():
 
                 if event.key == K_DOWN:
                     selected_option = (selected_option + 1) % len(options)
+                    print(selected_option)
                 if event.key == K_UP:
                     selected_option = (selected_option - 1) % len(options)
 
@@ -103,7 +105,7 @@ while running:
         if event.type == QUIT:
             running = False
         if event.type == KEYDOWN and event.key == K_ESCAPE:
-                pause_menu()
+                running = pause_menu()
 
     screen.fill(black)
     draw_text(screen, "Tekan ESC untuk Pause Menu", font, white, 250, 300)
