@@ -5,10 +5,9 @@ from pygame.locals import K_BACKSPACE, KEYDOWN, QUIT, K_ESCAPE, K_RETURN
 
 # Pendefinisian objek game kotak dengan membuat class dengan nama Square
 
-
 class Square(pygame.sprite.Sprite):
     def __init__(self, x, y):
-        super(Square, self).__init__()
+        super(Square, self).__init__() # Mewariskan inisialisasi dari class super/parent/orang tua
         self.surf = pygame.Surface((40, 40))
         self.surf.fill((0, 200, 255))
         self.rect = self.surf.get_rect(topleft=(x, y))
@@ -127,7 +126,8 @@ def draw_text(screen, text, font, color, x, y):
 def main_menu():
     # Memuat musik latar belakang (BGM)
     pygame.mixer.music.load('./Basics/assets/bgm.mp3')
-    pygame.mixer.music.play(-1)  # -1 Memutar musik secara loop (kosongkan parameter untuk memutar sekali)
+    # -1 Memutar musik secara loop (kosongkan parameter untuk memutar sekali)
+    pygame.mixer.music.play(-1)
 
     # Membuat pilihan menu
     selected_option = 0
@@ -137,7 +137,8 @@ def main_menu():
         screen.fill((0, 0, 0))
         draw_text(screen, "Main Menu", font, (255, 255, 255), 350, 200)
         for i, option in enumerate(options):
-            color = (255, 255, 255) if i == selected_option else (100, 100, 100)
+            color = (255, 255, 255) if i == selected_option else (
+                100, 100, 100)
             draw_text(screen, option, font, color, 350, 250 + i * 50)
 
         pygame.display.flip()
