@@ -30,7 +30,7 @@ while running:
             pygame.quit()
 
     # Mendapatkan input dari keyboard
-    keys = pygame.key.get_pressed()
+    keys = pygame.key.get_pressed() # True/False
     if keys[pygame.K_LEFT]:
         square_x -= speed
     if keys[pygame.K_RIGHT]:
