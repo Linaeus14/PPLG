@@ -6,13 +6,13 @@ pygame.init()
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Poem Pygame")
 
-font1 = pygame.font.Font(None, 36)
-font2 = pygame.font.Font(None, 24)
+font1 = pygame.font.SysFont("Arial", 36)
+font2 = pygame.font.SysFont("Times New Roman", 24)
 
 title = ["Title 1", "Title 2", "Title 3"]
 poem = [
     """
-    This is the first line
+    This is the first linen
     of the first poem.
     It has multiple lines
     to demonstrate the
