@@ -1,16 +1,24 @@
 import pygame
 import sys
 import random
+import json
+import os
 from pygame.locals import K_UP, K_DOWN, K_LEFT, K_RIGHT, KEYDOWN, QUIT, K_ESCAPE, K_RETURN
 
 # Inisialisasi Pygame
 pygame.init()
+pygame.mixer.init()
 
 # Menentukan dimensi layar
 screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Snake Game")
+
+# Menetukan Sound yang digunakan
+pygame.mixer.music.load("Final/assets/bgm.mp3")
+pygame.mixer.music.play(-1)
+sfx = pygame.mixer.Sound("Final/assets/move.wav")
 
 # Warna
 white = (255, 255, 255)
@@ -120,7 +128,21 @@ class Game:
             Fence(0, screen_height - 5, screen_width, 5, white),  # Bottom
             Fence(screen_width - 5, 80, 5, screen_height, white)  # Right
         ]
+        self.high_score = Game.load_score()
         self.score = 0
+
+    # Fungsi untuk menyimpan nomor ke file
+    def save_score(score):
+        with open("Final/assets/save.json", "w") as penyimpanan:
+            json.dump({"score": score}, penyimpanan)
+
+    # Fungsi untuk memuat nomor dari file
+    def load_score():
+        if os.path.exists("Final/assets/save.json"):
+            with open("Final/assets/save.json", "r") as penyimpanan:
+                data = json.load(penyimpanan)
+                return data.get("score", 0)
+        return 0
 
     def create_food(self):
         while True:
@@ -148,6 +170,7 @@ class Game:
     def update(self):
         self.snake.move()
         if self.snake.check_collision(self.food):
+            sfx.play()
             self.score += 1
             self.snake.grow()
             self.food = self.create_food()
@@ -176,10 +199,13 @@ def draw_text(screen, text, font, color, x, y):
 def main_menu():
     selected_option = 0
     options = ["Start Game", "Quit"]
+    high_score = Game.load_score()
 
     while True:
         screen.fill(black)
         draw_text(screen, "Snake", fontTitle, white, 100, 200)
+        draw_text(screen, "High Score:", fontText, white, 600, 200)
+        draw_text(screen, str(high_score), fontText, white, 600, 250)
         for i, option in enumerate(options):
             color = white if i == selected_option else (100, 100, 100)
             draw_text(screen, option, fontText, color, 100, 255 + i * 35)
@@ -231,6 +257,7 @@ def pause_menu():
                     if selected_option == 0:
                         return True
                     elif selected_option == 1:
+                        Game.save_score(game.score)
                         return main_menu()
                     elif selected_option == 2:
                         pygame.quit()
@@ -248,12 +275,15 @@ def game_over_menu(score):
     options = ["Restart", "Main Menu"]
 
     while True:
+        if score > Game.load_score():
+            Game.save_score(score)
         screen.fill(black)
         draw_text(screen, "Game Over!", fontTitle, white, 300, 200)
         for i, option in enumerate(options):
             color = white if i == selected_option else (100, 100, 100)
             draw_text(screen, option, fontText, color, 300, 260 + i * 35)
-        draw_text(screen, f"Score: {score}", fontText, white, 300, 270 + len(options) * 35)
+        draw_text(screen, f"Score: {score}", fontText,
+                  white, 300, 270 + len(options) * 35)
 
         pygame.display.flip()
 
