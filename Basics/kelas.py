@@ -25,26 +25,37 @@ class Mesin():
         self._status = False
         print("Mesin Dimatikan")
 
-
 class Mobil(Mesin):
-    brand = ""
-    model = ""
-    warna = ""
-    jumlahPintu = 0
+    __brand = ""
+    __model = ""
+    __warna = ""
+    __jumlahPintu = 0
 
     def __init__(self, Mesin, brand, model, warna, jumlahPintu):
         super().__init__(Mesin._nama, Mesin._kecepatan, Mesin._bahanBakar, Mesin._berat)
-        self.brand = brand
-        self.model = model
-        self.warna = warna
-        self.jumlahPintu = jumlahPintu
+        self.__brand = brand
+        self.__model = model
+        self.__warna = warna
+        self.__jumlahPintu = jumlahPintu
 
     def nyalakanMobil(self):
-        self._nyalakan()
+        if self._status:
+            print("Tidak bisa menyalakan! Mobil sudah nyala!")
+        else:
+            self._nyalakan()
 
-    def klakson():
-        print("Beep Beep")
+    def getBrand(self):
+        return self.__brand
+
+    def getModel(self):
+        return self.__model
+
+    def setBrand(self, brand):
+        self.__brand = brand
 
 mesin1 = Mesin("V8", 120, "Besin", 28)
 mobil1 = Mobil(mesin1, "BMW", "RX-8", "Silver", 2)
 mobil1.nyalakanMobil()
+print(mobil1.getBrand())
+mobil1.setBrand("GTX")
+print(mobil1.getBrand())
