@@ -52,7 +52,7 @@ while running:
     screen.fill(black)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            save_number(number)
+            save_number(number, "John")
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and number < 10:

@@ -149,7 +149,7 @@ class Game:
             x = random.randint(
                 (0 // size) + 1, (screen_width // size) - 1) * size
             y = random.randint(
-                (80 // size) + 1, ((screen_height) // size) - 1) * size
+                (80 // size) + 1, ((screen_height) // size) - 2) * size
             food = Food(x, y, size, red)
             if not any(segment.colliderect(food.rect) for segment in self.snake.segments):
                 return food
