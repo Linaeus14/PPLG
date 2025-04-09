@@ -41,12 +41,10 @@ while running:
         square_y += speed
 
     # Deteksi tabrakan dengan batas layar
-    if square_x < 0:
-        square_x = 0
+    square_x = max(square_x, 0)
     if square_x + square_size > screen_width:
         square_x = screen_width - square_size
-    if square_y < 0:
-        square_y = 0
+    square_y = max(square_y, 0)
     if square_y + square_size > screen_height:
         square_y = screen_height - square_size
 
