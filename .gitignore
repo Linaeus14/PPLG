@@ -1,3 +1,6 @@
 .history
 .vscode
-/PTS
+*/PTS
+*/__pycache__
+*/build
+*.spec
